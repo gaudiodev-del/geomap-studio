@@ -7,85 +7,146 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f0f7ff;--surface:#ffffff;--surface2:#e8f1fb;--border:#c2d8f0;--accent:#1e6fb5;--accent-light:#dbeeff;--accent2:#e85d04;--text:#0f2a45;--muted:#5a7fa0;--ok:#1a7a4a;--ok-bg:#e6f5ee;--r:8px}
+:root{
+  --bg:#f1f5f9;--surface:#fff;--surface2:#f8fafc;--border:#e2e8f0;--border-strong:#cbd5e1;
+  --accent:#2563eb;--accent-h:#1d4ed8;--accent-light:#eff6ff;
+  --text:#0f172a;--muted:#64748b;--ok:#16a34a;--ok-bg:#f0fdf4;--ok-border:#bbf7d0;
+  --r:10px;--r-sm:6px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.08);--shadow:0 4px 12px rgba(0,0,0,.08);--shadow-lg:0 10px 30px rgba(0,0,0,.12);
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
-header{background:var(--accent);padding:0 20px;display:flex;align-items:stretch;gap:12px;flex-shrink:0;box-shadow:0 2px 8px rgba(30,111,181,.3)}
-header h1{font-size:17px;font-weight:800;color:#fff;padding:11px 0;letter-spacing:-.3px}
-header h1 span{color:#9dd4ff;font-weight:400}
-.badge{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);color:rgba(255,255,255,.92);font-family:'Space Mono',monospace;font-size:10px;padding:2px 9px;border-radius:20px;align-self:center}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;font-size:14px}
+
+/* HEADER */
+header{background:linear-gradient(135deg,#1e40af 0%,#2563eb 60%,#3b82f6 100%);padding:0 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;height:52px;box-shadow:0 2px 12px rgba(37,99,235,.4);position:relative;z-index:100}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+header h1{font-size:16px;font-weight:700;color:#fff;letter-spacing:-.3px}
+header h1 span{color:rgba(255,255,255,.6);font-weight:400}
+.badge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.9);font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 10px;border-radius:20px}
+.header-badges{display:flex;gap:6px;margin-left:auto;align-items:center}
+.hstat{display:none;flex-direction:column;align-items:center;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:3px 12px;min-width:56px}
+.hstat .n{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;color:#fff;line-height:1}
+.hstat .l{font-size:9px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+
+/* LAYOUT */
 .layout{display:flex;flex:1;overflow:hidden}
-.sidebar{width:310px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;box-shadow:2px 0 8px rgba(30,111,181,.07)}
+
+/* SIDEBAR */
+.sidebar{width:300px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;box-shadow:2px 0 12px rgba(0,0,0,.04)}
 .sidebar::-webkit-scrollbar{width:4px}.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
-.sec{border-bottom:1px solid var(--border);padding:14px 15px}
-.sec-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:6px}
-.sec-title::before{content:'';display:block;width:3px;height:11px;background:var(--accent);border-radius:2px}
-.dropzone{border:2px dashed var(--border);border-radius:var(--r);padding:18px;text-align:center;cursor:pointer;transition:.2s;background:var(--surface2);position:relative}
-.dropzone:hover,.dropzone.over{border-color:var(--accent);background:var(--accent-light)}
+
+/* SECTIONS */
+.sec{border-bottom:1px solid var(--border);padding:16px}
+.sec-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sec-icon{width:20px;height:20px;background:var(--accent-light);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px}
+
+/* DROPZONE */
+.dropzone{border:2px dashed var(--border-strong);border-radius:var(--r);padding:20px 16px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface2);position:relative}
+.dropzone:hover,.dropzone.over{border-color:var(--accent);background:var(--accent-light);transform:translateY(-1px);box-shadow:var(--shadow-sm)}
 .dropzone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.dropzone .ico{font-size:26px;margin-bottom:5px}
-.dropzone p{font-size:12px;color:var(--muted);line-height:1.5}
+.dropzone .ico{font-size:28px;margin-bottom:8px;line-height:1}
+.dropzone p{font-size:12px;color:var(--muted);line-height:1.6}
 .dropzone strong{color:var(--accent)}
-.ok-box{display:flex;align-items:center;gap:8px;background:var(--ok-bg);border:1px solid #a3d9be;border-radius:var(--r);padding:7px 11px;font-size:12px;color:var(--ok);font-family:'Space Mono',monospace;margin-top:9px}
-.stats{display:flex;gap:7px;margin-top:9px}
-.stat{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:8px;text-align:center}
-.stat .n{font-family:'Space Mono',monospace;font-size:18px;font-weight:700;color:var(--accent)}
-.stat .l{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:1px}
-.rlist{display:flex;flex-direction:column;gap:6px;max-height:270px;overflow-y:auto}
+
+/* FILE INFO */
+.ok-box{display:flex;align-items:center;gap:8px;background:var(--ok-bg);border:1px solid var(--ok-border);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;color:var(--ok);font-family:'JetBrains Mono',monospace;margin-top:10px}
+.stats{display:flex;gap:8px;margin-top:10px}
+.stat{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 8px;text-align:center;transition:.2s}
+.stat:hover{border-color:var(--accent)}
+.stat .n{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:600;color:var(--accent);line-height:1}
+.stat .l{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+
+/* RESULT LIST */
+.rlist{display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto;padding-right:2px}
 .rlist::-webkit-scrollbar{width:3px}.rlist::-webkit-scrollbar-thumb{background:var(--border)}
-.ri{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:9px 11px}
-.ri-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
-.ri-name{font-size:11px;font-weight:700;color:var(--text);font-family:'Space Mono',monospace;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ri-cnt{font-size:10px;font-family:'Space Mono',monospace;background:var(--accent-light);padding:1px 7px;border-radius:10px;color:var(--accent);font-weight:600}
-.ctrl-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;align-items:start}
-.clbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:3px;font-weight:600}
-select.cs{width:100%;background:#fff;border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:11px;font-family:'Space Mono',monospace;padding:4px 5px;cursor:pointer;outline:none}
-select.cs:focus{border-color:var(--accent)}
-input[type=color]{width:100%;height:28px;border:1px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;padding:2px}
-input[type=number].cs{-moz-appearance:textfield}
+.ri{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;transition:.2s}
+.ri:hover{border-color:var(--border-strong);box-shadow:var(--shadow-sm)}
+.ri-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ri-name{font-size:11px;font-weight:600;color:var(--text);font-family:'JetBrains Mono',monospace;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ri-cnt{font-size:10px;font-family:'JetBrains Mono',monospace;background:var(--accent-light);padding:2px 8px;border-radius:12px;color:var(--accent);font-weight:600}
+
+/* CONTROLS */
+.ctrl-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;align-items:start}
+.clbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;font-weight:600}
+select.cs{width:100%;background:#fff;border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-size:11px;font-family:'JetBrains Mono',monospace;padding:5px 6px;cursor:pointer;outline:none;transition:.15s}
+select.cs:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+input[type=color]{width:100%;height:30px;border:1px solid var(--border);border-radius:var(--r-sm);background:#fff;cursor:pointer;padding:2px;transition:.15s}
+input[type=number].cs{-moz-appearance:textfield;width:100%;background:#fff;border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-size:11px;font-family:'JetBrains Mono',monospace;padding:5px 6px;outline:none;transition:.15s}
+input[type=number].cs:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
 input[type=number].cs::-webkit-inner-spin-button,input[type=number].cs::-webkit-outer-spin-button{-webkit-appearance:none}
-.ftog{display:flex;background:#fff;border:1px solid var(--border);border-radius:4px;overflow:hidden}
-.ftog button{flex:1;padding:4px;background:none;border:none;color:var(--muted);font-size:9px;font-family:'Space Mono',monospace;cursor:pointer;transition:.15s;text-transform:uppercase;font-weight:600}
+
+/* TOGGLE */
+.ftog{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden}
+.ftog button{flex:1;padding:5px 4px;background:none;border:none;color:var(--muted);font-size:9px;font-family:'JetBrains Mono',monospace;cursor:pointer;transition:.15s;text-transform:uppercase;font-weight:600}
+.ftog button:hover:not(.on){background:var(--border);color:var(--text)}
 .ftog button.on{background:var(--accent);color:#fff;font-weight:700}
-.btn{padding:9px 14px;border-radius:var(--r);border:none;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:7px;width:100%}
-.btn-p{background:var(--accent);color:#fff;box-shadow:0 2px 6px rgba(30,111,181,.25)}
-.btn-p:hover{background:#1658a0;transform:translateY(-1px);box-shadow:0 4px 12px rgba(30,111,181,.35)}
-.btn-p:disabled{background:#b0c8e8;color:#fff;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* BUTTONS */
+.btn{padding:9px 14px;border-radius:var(--r);border:none;font-family:'Inter',sans-serif;font-weight:600;font-size:13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px;width:100%}
+.btn-p{background:linear-gradient(135deg,var(--accent),#3b82f6);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.3)}
+.btn-p:hover{background:linear-gradient(135deg,var(--accent-h),#2563eb);transform:translateY(-1px);box-shadow:0 4px 16px rgba(37,99,235,.4)}
+.btn-p:disabled{background:#e2e8f0;color:#94a3b8;cursor:not-allowed;transform:none;box-shadow:none}
 .btn-s{background:#fff;border:1px solid var(--border);color:var(--text);margin-bottom:6px}
 .btn-s:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
-.btn-dl{background:#0a4a8a;color:#fff;border:none;border-radius:var(--r);padding:10px 14px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:7px;width:100%;animation:pulse 1.5s ease-in-out infinite}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(10,74,138,.5)}50%{box-shadow:0 0 0 6px rgba(10,74,138,0)}}
-input.ti{width:100%;background:#fff;border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:'Syne',sans-serif;font-size:13px;padding:7px 11px;outline:none;transition:.2s;margin-bottom:7px}
-input.ti:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(30,111,181,.1)}
-input.ti::placeholder{color:#a0bbcf}
+.btn-dl{background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff;border:none;border-radius:var(--r);padding:11px 14px;font-family:'Inter',sans-serif;font-weight:700;font-size:13px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:7px;width:100%;animation:pulse 2s ease-in-out infinite;box-shadow:0 4px 16px rgba(37,99,235,.4)}
+@keyframes pulse{0%,100%{box-shadow:0 4px 16px rgba(37,99,235,.4)}50%{box-shadow:0 4px 24px rgba(37,99,235,.65)}}
+
+/* INPUT */
+input.ti{width:100%;background:#fff;border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;outline:none;transition:.2s;margin-bottom:8px}
+input.ti:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+input.ti::placeholder{color:#94a3b8}
+
+/* PDF QUALITY TOGGLE */
+.pdf-opts{display:flex;gap:6px;margin-bottom:8px}
+.pdf-opt-btn{flex:1;padding:6px;border:1px solid var(--border);border-radius:var(--r-sm);background:#fff;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;cursor:pointer;text-align:center;color:var(--muted);transition:.15s;text-transform:uppercase}
+.pdf-opt-btn:hover{border-color:var(--accent);color:var(--accent)}
+.pdf-opt-btn.on{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+
+/* PROGRESS */
+.progress-wrap{display:none;margin-top:8px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;overflow:hidden;height:6px}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),#60a5fa);border-radius:20px;transition:width .3s ease;width:0%}
+
+/* MAP */
 #map-wrap{flex:1;position:relative;overflow:hidden}
 #map{width:100%;height:100%}
-.empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;z-index:10;background:rgba(240,247,255,.9);gap:10px}
+.empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;z-index:10;background:rgba(241,245,249,.92);gap:12px;backdrop-filter:blur(2px)}
 .empty.gone{display:none}
-.empty .ei{font-size:46px;opacity:.4}
-.empty h2{font-size:17px;color:var(--muted);font-weight:600}
-.empty p{font-size:12px;color:var(--muted);opacity:.7;font-family:'Space Mono',monospace}
-.toast{position:fixed;bottom:18px;right:18px;background:#fff;border:1px solid #a3d9be;color:var(--ok);font-family:'Space Mono',monospace;font-size:12px;padding:10px 16px;border-radius:var(--r);z-index:9999;transform:translateY(60px);opacity:0;transition:.3s;max-width:320px;white-space:pre-line;box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.empty .ei{font-size:56px;opacity:.3}
+.empty h2{font-size:18px;color:var(--muted);font-weight:600}
+.empty p{font-size:12px;color:var(--muted);opacity:.7;font-family:'JetBrains Mono',monospace}
+
+/* COORD INFO */
+.map-info{position:absolute;bottom:28px;left:12px;z-index:900;background:rgba(255,255,255,.9);backdrop-filter:blur(4px);border:1px solid var(--border);border-radius:var(--r-sm);padding:4px 10px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);pointer-events:none;display:none}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:#fff;border:1px solid var(--ok-border);color:var(--ok);font-family:'JetBrains Mono',monospace;font-size:12px;padding:12px 18px;border-radius:var(--r);z-index:9999;transform:translateY(70px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);max-width:340px;white-space:pre-line;box-shadow:var(--shadow-lg)}
 .toast.show{transform:translateY(0);opacity:1}
-.spin{display:none;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
+.spin{display:none;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
+.hint{font-size:11px;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 11px;line-height:1.6;margin-top:8px}
 .leaflet-container{background:#dce8f4!important}
-.hint{font-size:11px;color:var(--muted);background:var(--accent-light);border:1px solid var(--border);border-radius:6px;padding:8px 10px;line-height:1.6;margin-top:6px}
 </style>
 </head>
 <body>
 <header>
-  <h1>Geo<span>Map</span> Studio</h1>
-  <span class="badge">v4.0</span>
-  <span class="badge" style="margin-left:auto">Lat · Lng · Resultado</span>
+  <div class="logo">
+    <div class="logo-icon">🗺</div>
+    <h1>Geo<span>Map</span> Studio</h1>
+  </div>
+  <span class="badge">v5.0</span>
+  <div class="header-badges">
+    <div class="hstat" id="hStatPts"><span class="n" id="hPts">0</span><span class="l">Puntos</span></div>
+    <div class="hstat" id="hStatRes"><span class="n" id="hRes">0</span><span class="l">Resultados</span></div>
+  </div>
 </header>
 <div class="layout">
   <div class="sidebar">
 
     <div class="sec">
-      <div class="sec-title">Cargar archivo</div>
+      <div class="sec-title"><span class="sec-icon">📂</span>Cargar archivo</div>
       <div class="dropzone" id="dz">
         <input type="file" id="fi" accept=".xlsx,.xls,.csv">
         <div class="ico">📊</div>
@@ -101,119 +162,146 @@ input.ti::placeholder{color:#a0bbcf}
     </div>
 
     <div class="sec">
-      <div class="sec-title">Configurar íconos</div>
+      <div class="sec-title"><span class="sec-icon">🎨</span>Configurar íconos</div>
       <div class="rlist" id="rlist">
-        <p style="font-size:12px;color:var(--muted);text-align:center;padding:14px 0">Cargá un archivo para configurar</p>
+        <p style="font-size:12px;color:var(--muted);text-align:center;padding:16px 0;line-height:1.8">Cargá un archivo<br>para configurar los íconos</p>
       </div>
     </div>
 
     <div class="sec">
-      <div class="sec-title">Mapa</div>
+      <div class="sec-title"><span class="sec-icon">🗺</span>Mapa</div>
       <button class="btn btn-s" onclick="fitMap()">🎯 Centrar en puntos</button>
-      <button class="btn btn-s" style="margin-bottom:0" onclick="clearAll()">🗑️ Limpiar todo</button>
+      <button class="btn btn-s" style="margin-bottom:0" onclick="clearAll()">🗑 Limpiar todo</button>
     </div>
 
     <div class="sec">
-      <div class="sec-title">Exportar PDF</div>
+      <div class="sec-title"><span class="sec-icon">📄</span>Exportar PDF</div>
       <input type="text" class="ti" id="pdfTitle" placeholder="Título del mapa…">
+      <div class="pdf-opts">
+        <button class="pdf-opt-btn on" data-q="standard" onclick="setPdfQ(this)">📄 Estándar</button>
+        <button class="pdf-opt-btn" data-q="hd" onclick="setPdfQ(this)">🔍 Alta res</button>
+      </div>
       <button class="btn btn-p" id="pdfBtn" onclick="exportPDF()" disabled>
         <div class="spin" id="spin"></div>
         <span id="pdfTxt">⬇ Generar PDF</span>
       </button>
-      <div id="dlWrap" style="display:none;margin-top:10px">
-        <a id="dlLink" href="#" download="mapa.pdf" class="btn btn-dl">📄 Descargar PDF — click aquí</a>
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress-bar" id="progressBar"></div>
       </div>
-      <div class="hint">Hacé click en <b>Generar PDF</b> y luego en el botón azul para descargar.</div>
+      <div id="dlWrap" style="display:none;margin-top:10px">
+        <a id="dlLink" href="#" download="mapa.pdf" class="btn-dl">📄 Descargar PDF — click aquí</a>
+      </div>
+      <div class="hint">Incluye mapa, leyenda, escala y flecha norte. Alta res tarda más pero da mejor calidad.</div>
     </div>
 
   </div>
 
   <div id="map-wrap">
     <div class="empty" id="empty">
-      <div class="ei">🗺️</div>
+      <div class="ei">🗺</div>
       <h2>Sin datos cargados</h2>
-      <p>Subí un Excel para comenzar</p>
+      <p>Subí un Excel o CSV para comenzar</p>
     </div>
     <div id="map"></div>
+    <div class="map-info" id="mapInfo"><span id="coordInfo">—</span></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
 
 <script>
 // ── MAP ───────────────────────────────────────────────────────────────────────
-const map = L.map('map',{center:[-34.6,-58.4],zoom:5});
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-  attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-  maxZoom:19
+const map = L.map('map', { center: [-34.6, -58.4], zoom: 5 });
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  maxZoom: 19
 }).addTo(map);
 
-const currentLayer = 'osm';
-const TILE_URL = (z,x,y) => `https://${'abc'[(x+y)%3]}.tile.openstreetmap.org/${z}/${x}/${y}.png`;
+map.on('mousemove', e => {
+  document.getElementById('coordInfo').textContent =
+    `${e.latlng.lat.toFixed(5)}, ${e.latlng.lng.toFixed(5)}`;
+});
 
-// ── Etiqueta Islas Malvinas ───────────────────────────────────────────────────
-const malvinasLat=-51.73, malvinasLng=-59.0;
-const malvinasLabel = L.marker([malvinasLat,malvinasLng],{
+// ── Malvinas ──────────────────────────────────────────────────────────────────
+const malvinasLabel = L.marker([-51.73, -59.0], {
   icon: L.divIcon({
-    className:'',
-    html:`<div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:#2c4a6e;white-space:nowrap;text-shadow:1px 1px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,0 1px 0 #fff,0 -1px 0 #fff,1px 0 0 #fff,-1px 0 0 #fff;pointer-events:none;letter-spacing:0.3px;opacity:0.92">Islas Malvinas<br><span style="font-size:9px;font-weight:400;color:#4a6a8e">(Arg.)</span></div>`,
-    iconAnchor:[40,8]
+    className: '',
+    html: `<div style="font-family:'Inter',sans-serif;font-size:11px;font-weight:700;color:#2c4a6e;white-space:nowrap;text-shadow:1px 1px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff;pointer-events:none;opacity:.9">Islas Malvinas<br><span style="font-size:9px;font-weight:400;color:#4a6a8e">(Arg.)</span></div>`,
+    iconAnchor: [40, 8]
   }),
-  interactive:false, keyboard:false, zIndexOffset:-1000
+  interactive: false, keyboard: false, zIndexOffset: -1000
 }).addTo(map);
 
-map.on('zoomend',()=>{
-  const z=map.getZoom();
-  if(z>=4&&z<=13){if(!map.hasLayer(malvinasLabel))map.addLayer(malvinasLabel);}
-  else{if(map.hasLayer(malvinasLabel))map.removeLayer(malvinasLabel);}
+map.on('zoomend', () => {
+  const z = map.getZoom();
+  if (z >= 4 && z <= 13) { if (!map.hasLayer(malvinasLabel)) map.addLayer(malvinasLabel); }
+  else { if (map.hasLayer(malvinasLabel)) map.removeLayer(malvinasLabel); }
 });
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
-let allPoints=[], resultCfg={}, markers=[], bufferLayers=[];
-const COLORS=['#00e5ff','#ff6b35','#00ff9d','#ff3b7a','#ffe600','#b24aff','#ff9900','#22d3ee'];
-const SHAPES=['circle','square','triangle','hexagon','star'];
+let allPoints = [], resultCfg = {}, markers = [], bufferLayers = [];
+let pdfQuality = 'standard';
+const COLORS = ['#3b82f6','#ef4444','#22c55e','#f59e0b','#8b5cf6','#ec4899','#06b6d4','#f97316'];
+const SHAPES = ['circle', 'square', 'triangle', 'hexagon', 'star'];
+
+// ── DEBOUNCE ──────────────────────────────────────────────────────────────────
+function debounce(fn, ms) {
+  let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+}
+const renderMarkersDebounced = debounce(renderMarkers, 150);
 
 // ── UPLOAD ────────────────────────────────────────────────────────────────────
-const dz=document.getElementById('dz'), fi=document.getElementById('fi');
-dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over')});
-dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
-dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('over');if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0])});
-fi.addEventListener('change',e=>{if(e.target.files[0])loadFile(e.target.files[0])});
+const dz = document.getElementById('dz'), fi = document.getElementById('fi');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
+fi.addEventListener('change', e => { if (e.target.files[0]) loadFile(e.target.files[0]); });
 
-function loadFile(file){
-  const rd=new FileReader();
-  rd.onload=e=>{
-    try{
-      const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
-      const ws=wb.Sheets[wb.SheetNames[0]];
-      const rows=XLSX.utils.sheet_to_json(ws,{header:1});
-      allPoints=[]; const seen={};
-      for(let i=1;i<rows.length;i++){
-        const r=rows[i];
-        const lat=parseFloat(r[0]),lng=parseFloat(r[1]),res=String(r[2]??'Sin resultado').trim();
-        if(isNaN(lat)||isNaN(lng))continue;
-        allPoints.push({lat,lng,res});
-        if(!seen[res]){seen[res]=true;if(!resultCfg[res]){const idx=Object.keys(seen).length-1;resultCfg[res]={shape:SHAPES[idx%SHAPES.length],color:COLORS[idx%COLORS.length],fill:true,size:'grande',bufferKm:'',bufferColor:'#1e6fb5'};}}
+function loadFile(file) {
+  const rd = new FileReader();
+  rd.onload = e => {
+    try {
+      const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
+      allPoints = []; const seen = {};
+      for (let i = 1; i < rows.length; i++) {
+        const r = rows[i];
+        const lat = parseFloat(r[0]), lng = parseFloat(r[1]), res = String(r[2] ?? 'Sin resultado').trim();
+        if (isNaN(lat) || isNaN(lng)) continue;
+        allPoints.push({ lat, lng, res });
+        if (!seen[res]) {
+          seen[res] = true;
+          if (!resultCfg[res]) {
+            const idx = Object.keys(seen).length - 1;
+            resultCfg[res] = { shape: SHAPES[idx % SHAPES.length], color: COLORS[idx % COLORS.length], fill: true, size: 'grande', bufferKm: '', bufferColor: '#2563eb' };
+          }
+        }
       }
-      document.getElementById('fileInfo').style.display='block';
-      document.getElementById('fname').textContent=file.name;
-      document.getElementById('stTotal').textContent=allPoints.length;
-      document.getElementById('stRes').textContent=Object.keys(resultCfg).length;
+      document.getElementById('fileInfo').style.display = 'block';
+      document.getElementById('fname').textContent = file.name;
+      document.getElementById('stTotal').textContent = allPoints.length;
+      document.getElementById('stRes').textContent = Object.keys(resultCfg).length;
+      document.getElementById('hPts').textContent = allPoints.length;
+      document.getElementById('hRes').textContent = Object.keys(resultCfg).length;
+      document.getElementById('hStatPts').style.display = 'flex';
+      document.getElementById('hStatRes').style.display = 'flex';
+      document.getElementById('mapInfo').style.display = 'block';
       buildList(); renderMarkers();
-      document.getElementById('pdfBtn').disabled=false;
+      document.getElementById('pdfBtn').disabled = false;
       document.getElementById('empty').classList.add('gone');
-      toast('✓ '+allPoints.length+' puntos cargados');
-    }catch(err){toast('❌ Error al leer el archivo',true);}
+      toast('✓ ' + allPoints.length + ' puntos cargados');
+    } catch (err) { toast('❌ Error al leer el archivo', true); }
   };
   rd.readAsArrayBuffer(file);
 }
 
 // ── ICON LIST ─────────────────────────────────────────────────────────────────
-function buildList(){
-  const el=document.getElementById('rlist'); el.innerHTML='';
-  Object.entries(resultCfg).forEach(([res,cfg])=>{
-    const cnt=allPoints.filter(p=>p.res===res).length;
-    const d=document.createElement('div'); d.className='ri';
-    d.innerHTML=`
+function buildList() {
+  const el = document.getElementById('rlist'); el.innerHTML = '';
+  Object.entries(resultCfg).forEach(([res, cfg]) => {
+    const cnt = allPoints.filter(p => p.res === res).length;
+    const d = document.createElement('div'); d.className = 'ri';
+    d.innerHTML = `
       <div class="ri-head">
         <span class="ri-name" title="${hesc(res)}">${hesc(res)}</span>
         <span class="ri-cnt">${cnt} pts</span>
@@ -221,308 +309,392 @@ function buildList(){
       <div class="ctrl-grid">
         <div><label class="clbl">Forma</label>
           <select class="cs" data-res="${hesc(res)}" data-key="shape" onchange="upd(this)">
-            ${SHAPES.map(s=>`<option value="${s}"${cfg.shape===s?' selected':''}>${s}</option>`).join('')}
+            ${SHAPES.map(s => `<option value="${s}"${cfg.shape === s ? ' selected' : ''}>${s}</option>`).join('')}
           </select></div>
         <div><label class="clbl">Relleno</label>
           <div class="ftog">
-            <button class="${cfg.fill?'on':''}" data-res="${hesc(res)}" data-fill="true" onclick="setFill(this)">Lleno</button>
-            <button class="${!cfg.fill?'on':''}" data-res="${hesc(res)}" data-fill="false" onclick="setFill(this)">Vacío</button>
+            <button class="${cfg.fill ? 'on' : ''}" data-res="${hesc(res)}" data-fill="true" onclick="setFill(this)">Lleno</button>
+            <button class="${!cfg.fill ? 'on' : ''}" data-res="${hesc(res)}" data-fill="false" onclick="setFill(this)">Vacío</button>
           </div></div>
         <div><label class="clbl">Color</label>
           <input type="color" value="${cfg.color}" data-res="${hesc(res)}" data-key="color" onchange="upd(this)"></div>
       </div>
-      <div class="ctrl-grid" style="margin-top:5px">
+      <div class="ctrl-grid" style="margin-top:6px">
         <div><label class="clbl">Tamaño</label>
           <div class="ftog">
-            <button class="${cfg.size==='grande'?'on':''}" data-res="${hesc(res)}" data-size="grande" onclick="setSize(this)">Grande</button>
-            <button class="${cfg.size==='pequeño'?'on':''}" data-res="${hesc(res)}" data-size="pequeño" onclick="setSize(this)">Pequeño</button>
+            <button class="${cfg.size === 'grande' ? 'on' : ''}" data-res="${hesc(res)}" data-size="grande" onclick="setSize(this)">Grande</button>
+            <button class="${cfg.size === 'pequeño' ? 'on' : ''}" data-res="${hesc(res)}" data-size="pequeño" onclick="setSize(this)">Pequeño</button>
           </div></div>
         <div style="display:flex;gap:4px;align-items:flex-end">
           <div style="flex:0 0 45%">
             <label class="clbl">Buffer km</label>
             <input type="number" class="cs" min="0" step="0.5" placeholder="—"
-              value="${cfg.bufferKm||''}" data-res="${hesc(res)}" data-key="bufferKm"
-              onchange="upd(this)" style="padding:4px 3px;width:100%"></div>
+              value="${cfg.bufferKm || ''}" data-res="${hesc(res)}" data-key="bufferKm"
+              onchange="upd(this)" style="padding:5px 3px;width:100%"></div>
           <div style="flex:0 0 45%">
-            <label class="clbl">Color</label>
-            <input type="color" value="${cfg.bufferColor||'#1e6fb5'}" data-res="${hesc(res)}" data-key="bufferColor" onchange="upd(this)" style="width:100%"></div>
+            <label class="clbl">Color buf</label>
+            <input type="color" value="${cfg.bufferColor || '#2563eb'}" data-res="${hesc(res)}" data-key="bufferColor" onchange="upd(this)" style="width:100%"></div>
         </div>
         <div></div>
       </div>`;
     el.appendChild(d);
   });
 }
-function hesc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-function upd(el){const res=el.dataset.res;resultCfg[res][el.dataset.key]=el.value;renderMarkers();}
-function setFill(btn){
-  const res=btn.dataset.res,fill=btn.dataset.fill==='true';
-  resultCfg[res].fill=fill;
-  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on'); renderMarkers();
+
+function hesc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function upd(el) { resultCfg[el.dataset.res][el.dataset.key] = el.value; renderMarkersDebounced(); }
+function setFill(btn) {
+  const res = btn.dataset.res, fill = btn.dataset.fill === 'true';
+  resultCfg[res].fill = fill;
+  btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on'); renderMarkersDebounced();
 }
-function setSize(btn){
-  const res=btn.dataset.res;
-  resultCfg[res].size=btn.dataset.size;
-  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on'); renderMarkers();
+function setSize(btn) {
+  resultCfg[btn.dataset.res].size = btn.dataset.size;
+  btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on'); renderMarkersDebounced();
+}
+function setPdfQ(btn) {
+  pdfQuality = btn.dataset.q;
+  document.querySelectorAll('.pdf-opt-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
 }
 
 // ── SVG ICON ──────────────────────────────────────────────────────────────────
-function svgIcon(shape,color,fill,sz=24){
-  const c=sz/2,r=sz*.42,fc=fill?color:'none',sw=fill?0:2;
-  let b='';
-  if(shape==='circle')b=`<circle cx="${c}" cy="${c}" r="${r}" fill="${fc}" stroke="${color}" stroke-width="${sw}"/>`;
-  else if(shape==='square'){const q=sz*.78,o=(sz-q)/2;b=`<rect x="${o}" y="${o}" width="${q}" height="${q}" fill="${fc}" stroke="${color}" stroke-width="${sw}"/>`;}
-  else if(shape==='triangle')b=`<polygon points="${c},${sz*.08} ${sz*.92},${sz*.88} ${sz*.08},${sz*.88}" fill="${fc}" stroke="${color}" stroke-width="${sw}" stroke-linejoin="round"/>`;
-  else if(shape==='hexagon'){const pts=Array.from({length:6},(_,i)=>{const a=Math.PI/180*(60*i-30);return`${c+r*Math.cos(a)},${c+r*Math.sin(a)}`}).join(' ');b=`<polygon points="${pts}" fill="${fc}" stroke="${color}" stroke-width="${sw}"/>`;}
-  else if(shape==='star'){const or=r,ir=r*.42;const pts=Array.from({length:10},(_,i)=>{const a=Math.PI/180*(36*i-90),rad=i%2===0?or:ir;return`${c+rad*Math.cos(a)},${c+rad*Math.sin(a)}`}).join(' ');b=`<polygon points="${pts}" fill="${fc}" stroke="${color}" stroke-width="${sw}"/>`;}
-  return`<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg">${b}</svg>`;
+function svgIcon(shape, color, fill, sz = 24) {
+  const c = sz / 2, r = sz * .42, fc = fill ? color : 'none', sw = fill ? 0 : 2;
+  let b = '';
+  if (shape === 'circle') b = `<circle cx="${c}" cy="${c}" r="${r}" fill="${fc}" stroke="${color}" stroke-width="${sw}"/>`;
+  else if (shape === 'square') { const q = sz * .78, o = (sz - q) / 2; b = `<rect x="${o}" y="${o}" width="${q}" height="${q}" fill="${fc}" stroke="${color}" stroke-width="${sw}"/>`; }
+  else if (shape === 'triangle') b = `<polygon points="${c},${sz*.08} ${sz*.92},${sz*.88} ${sz*.08},${sz*.88}" fill="${fc}" stroke="${color}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+  else if (shape === 'hexagon') { const pts = Array.from({length:6},(_,i)=>{const a=Math.PI/180*(60*i-30);return`${c+r*Math.cos(a)},${c+r*Math.sin(a)}`}).join(' '); b = `<polygon points="${pts}" fill="${fc}" stroke="${color}" stroke-width="${sw}"/>`; }
+  else if (shape === 'star') { const or=r,ir=r*.42; const pts=Array.from({length:10},(_,i)=>{const a=Math.PI/180*(36*i-90),rad=i%2===0?or:ir;return`${c+rad*Math.cos(a)},${c+rad*Math.sin(a)}`}).join(' '); b = `<polygon points="${pts}" fill="${fc}" stroke="${color}" stroke-width="${sw}"/>`; }
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))">${b}</svg>`;
 }
 
 // ── MARKERS + BUFFERS ─────────────────────────────────────────────────────────
-function renderMarkers(){
-  markers.forEach(m=>map.removeLayer(m)); markers=[];
-  bufferLayers.forEach(b=>map.removeLayer(b)); bufferLayers=[];
-  allPoints.forEach(pt=>{
-    const cfg=resultCfg[pt.res]||{shape:'circle',color:'#00e5ff',fill:true,size:'grande',bufferKm:'',bufferColor:'#1e6fb5'};
-    const sz=cfg.size==='pequeño'?13:26;
-    const icon=L.divIcon({html:svgIcon(cfg.shape,cfg.color,cfg.fill,sz),className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]});
-    markers.push(L.marker([pt.lat,pt.lng],{icon}).bindPopup(`<b>${pt.res}</b><br><small>${pt.lat.toFixed(5)}, ${pt.lng.toFixed(5)}</small>`).addTo(map));
-    const km=parseFloat(cfg.bufferKm);
-    if(km>0){
-      const bc=cfg.bufferColor||'#1e6fb5';
-      bufferLayers.push(L.circle([pt.lat,pt.lng],{radius:km*1000,color:bc,fillColor:bc,fillOpacity:0.12,weight:1.5,opacity:0.7}).addTo(map));
+function renderMarkers() {
+  markers.forEach(m => map.removeLayer(m)); markers = [];
+  bufferLayers.forEach(b => map.removeLayer(b)); bufferLayers = [];
+  allPoints.forEach(pt => {
+    const cfg = resultCfg[pt.res] || { shape:'circle', color:'#3b82f6', fill:true, size:'grande', bufferKm:'', bufferColor:'#2563eb' };
+    const sz = cfg.size === 'pequeño' ? 13 : 26;
+    const icon = L.divIcon({ html: svgIcon(cfg.shape, cfg.color, cfg.fill, sz), className:'', iconSize:[sz,sz], iconAnchor:[sz/2,sz/2] });
+    markers.push(L.marker([pt.lat, pt.lng], { icon }).bindPopup(
+      `<div style="font-family:'Inter',sans-serif;min-width:140px"><b style="color:#0f172a">${pt.res}</b><br><span style="color:#64748b;font-size:11px;font-family:'JetBrains Mono',monospace">${pt.lat.toFixed(5)}, ${pt.lng.toFixed(5)}</span></div>`
+    ).addTo(map));
+    const km = parseFloat(cfg.bufferKm);
+    if (km > 0) {
+      const bc = cfg.bufferColor || '#2563eb';
+      bufferLayers.push(L.circle([pt.lat, pt.lng], { radius: km * 1000, color: bc, fillColor: bc, fillOpacity: 0.1, weight: 1.5, opacity: 0.6 }).addTo(map));
     }
   });
 }
-function fitMap(){if(allPoints.length)map.fitBounds(L.latLngBounds(allPoints.map(p=>[p.lat,p.lng])),{padding:[40,40]})}
-function clearAll(){
-  markers.forEach(m=>map.removeLayer(m)); markers=[];
-  bufferLayers.forEach(b=>map.removeLayer(b)); bufferLayers=[];
-  allPoints=[]; resultCfg={};
-  document.getElementById('fileInfo').style.display='none';
-  document.getElementById('rlist').innerHTML='<p style="font-size:12px;color:var(--muted);text-align:center;padding:14px 0">Cargá un archivo para configurar</p>';
-  document.getElementById('pdfBtn').disabled=true;
-  document.getElementById('dlWrap').style.display='none';
+
+function fitMap() { if (allPoints.length) map.fitBounds(L.latLngBounds(allPoints.map(p => [p.lat, p.lng])), { padding:[40,40] }); }
+function clearAll() {
+  markers.forEach(m => map.removeLayer(m)); markers = [];
+  bufferLayers.forEach(b => map.removeLayer(b)); bufferLayers = [];
+  allPoints = []; resultCfg = {};
+  document.getElementById('fileInfo').style.display = 'none';
+  document.getElementById('hStatPts').style.display = 'none';
+  document.getElementById('hStatRes').style.display = 'none';
+  document.getElementById('mapInfo').style.display = 'none';
+  document.getElementById('rlist').innerHTML = '<p style="font-size:12px;color:var(--muted);text-align:center;padding:16px 0;line-height:1.8">Cargá un archivo<br>para configurar los íconos</p>';
+  document.getElementById('pdfBtn').disabled = true;
+  document.getElementById('dlWrap').style.display = 'none';
   document.getElementById('empty').classList.remove('gone');
   toast('Mapa limpiado');
 }
 
-// ── CANVAS HELPERS ────────────────────────────────────────────────────────────
-function mercY(lat){return Math.log(Math.tan(Math.PI/4+lat*Math.PI/360))}
-function lng2tile(lng,z){return Math.floor((lng+180)/360*Math.pow(2,z))}
-function lat2tile(lat,z){return Math.floor((1-Math.log(Math.tan(lat*Math.PI/180)+1/Math.cos(lat*Math.PI/180))/Math.PI)/2*Math.pow(2,z))}
-function tile2lng(x,z){return x/Math.pow(2,z)*360-180}
-function tile2lat(y,z){const n=Math.PI-2*Math.PI*y/Math.pow(2,z);return 180/Math.PI*Math.atan(.5*(Math.exp(n)-Math.exp(-n)))}
-function hexToRgba(hex,alpha){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return`rgba(${r},${g},${b},${alpha})`}
-function niceStep(span){const raw=span/4,mag=Math.pow(10,Math.floor(Math.log10(raw))),n=raw/mag;return(n<1.5?1:n<3.5?2:n<7.5?5:10)*mag}
+// ── TILE HELPERS + CACHE ───────────────────────────────────────────────────────
+const TILE_URL = (z, x, y) => `https://${'abc'[(x+y)%3]}.tile.openstreetmap.org/${z}/${x}/${y}.png`;
+const tileCache = new Map();
 
-function drawCanvasShape(ctx,shape,cx,cy,sz,color,filled){
-  const r=sz/2;
+function loadTile(url) {
+  if (tileCache.has(url)) return Promise.resolve(tileCache.get(url));
+  return new Promise(resolve => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => { tileCache.set(url, img); resolve(img); };
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+}
+
+function lng2tile(lng, z) { return Math.floor((lng + 180) / 360 * Math.pow(2, z)); }
+function lat2tile(lat, z) { return Math.floor((1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, z)); }
+function tile2lng(x, z) { return x / Math.pow(2, z) * 360 - 180; }
+function tile2lat(y, z) { const n = Math.PI - 2 * Math.PI * y / Math.pow(2, z); return 180 / Math.PI * Math.atan(.5 * (Math.exp(n) - Math.exp(-n))); }
+function hexToRgba(hex, alpha) { const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16); return `rgba(${r},${g},${b},${alpha})`; }
+function mY(lat) { return Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)); }
+
+// ── CANVAS SHAPE ──────────────────────────────────────────────────────────────
+function drawCanvasShape(ctx, shape, cx, cy, sz, color, filled) {
+  const r = sz / 2;
   ctx.beginPath();
-  if(shape==='circle')ctx.arc(cx,cy,r,0,Math.PI*2);
-  else if(shape==='square')ctx.rect(cx-r,cy-r,sz,sz);
-  else if(shape==='triangle'){ctx.moveTo(cx,cy-r);ctx.lineTo(cx+r,cy+r*.85);ctx.lineTo(cx-r,cy+r*.85);ctx.closePath();}
-  else if(shape==='hexagon'){for(let i=0;i<6;i++){const a=Math.PI/3*i-Math.PI/6;i?ctx.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a)):ctx.moveTo(cx+r*Math.cos(a),cy+r*Math.sin(a))}ctx.closePath();}
-  else if(shape==='star'){const ir=r*.42;for(let i=0;i<10;i++){const a=Math.PI/5*i-Math.PI/2,rad=i%2===0?r:ir;i?ctx.lineTo(cx+rad*Math.cos(a),cy+rad*Math.sin(a)):ctx.moveTo(cx+rad*Math.cos(a),cy+rad*Math.sin(a))}ctx.closePath();}
-  ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=4;
-  if(filled){ctx.fillStyle=color;ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle='rgba(0,0,0,.3)';ctx.lineWidth=1;ctx.stroke();}
-  else{ctx.fillStyle='rgba(255,255,255,.15)';ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.stroke();}
-  ctx.shadowBlur=0;
+  if (shape === 'circle') ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  else if (shape === 'square') ctx.rect(cx - r, cy - r, sz, sz);
+  else if (shape === 'triangle') { ctx.moveTo(cx, cy - r); ctx.lineTo(cx + r, cy + r * .85); ctx.lineTo(cx - r, cy + r * .85); ctx.closePath(); }
+  else if (shape === 'hexagon') { for (let i = 0; i < 6; i++) { const a = Math.PI / 3 * i - Math.PI / 6; i ? ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a)) : ctx.moveTo(cx + r * Math.cos(a), cy + r * Math.sin(a)); } ctx.closePath(); }
+  else if (shape === 'star') { const ir = r * .42; for (let i = 0; i < 10; i++) { const a = Math.PI / 5 * i - Math.PI / 2, rad = i % 2 === 0 ? r : ir; i ? ctx.lineTo(cx + rad * Math.cos(a), cy + rad * Math.sin(a)) : ctx.moveTo(cx + rad * Math.cos(a), cy + rad * Math.sin(a)); } ctx.closePath(); }
+  ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 4;
+  if (filled) { ctx.fillStyle = color; ctx.fill(); ctx.shadowBlur = 0; ctx.strokeStyle = 'rgba(0,0,0,.25)'; ctx.lineWidth = 1; ctx.stroke(); }
+  else { ctx.fillStyle = 'rgba(255,255,255,.1)'; ctx.fill(); ctx.shadowBlur = 0; ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.stroke(); }
+  ctx.shadowBlur = 0;
 }
 
-function loadTile(url){
-  return new Promise(resolve=>{
-    const img=new Image();
-    img.crossOrigin='anonymous';
-    img.onload=()=>resolve(img);
-    img.onerror=()=>resolve(null);
-    img.src=url;
-  });
+// ── SCALE BAR ─────────────────────────────────────────────────────────────────
+function drawScaleBar(ctx, minLat, minLng, maxLng, W, H) {
+  const metersPerPx = (maxLng - minLng) / W * 111320 * Math.cos(minLat * Math.PI / 180);
+  const targetPx = W * 0.18;
+  const meters = metersPerPx * targetPx;
+  let nice, label;
+  if (meters > 100000) { nice = Math.round(meters / 100000) * 100000; label = (nice / 1000) + ' km'; }
+  else if (meters > 10000) { nice = Math.round(meters / 10000) * 10000; label = (nice / 1000) + ' km'; }
+  else if (meters > 1000) { nice = Math.round(meters / 1000) * 1000; label = (nice / 1000) + ' km'; }
+  else { nice = Math.round(meters / 100) * 100; label = nice + ' m'; }
+  const barPx = nice / metersPerPx;
+  const x0 = W - barPx - 18, y0 = H - 22;
+  ctx.fillStyle = 'rgba(255,255,255,.88)';
+  ctx.beginPath(); ctx.roundRect(x0 - 8, y0 - 14, barPx + 16, 28, 5); ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,.15)'; ctx.lineWidth = 1; ctx.stroke();
+  ctx.fillStyle = '#1e3a5f'; ctx.strokeStyle = '#1e3a5f'; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(x0, y0 + 6); ctx.lineTo(x0 + barPx, y0 + 6); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x0, y0 + 2); ctx.lineTo(x0, y0 + 10); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x0 + barPx, y0 + 2); ctx.lineTo(x0 + barPx, y0 + 10); ctx.stroke();
+  ctx.font = 'bold 16px sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = '#1e3a5f';
+  ctx.fillText(label, x0 + barPx / 2, y0 - 2); ctx.textAlign = 'left';
 }
 
-async function buildMapCanvas(W,H){
-  const cv=document.createElement('canvas');cv.width=W;cv.height=H;
-  const ctx=cv.getContext('2d');
-  ctx.fillStyle='#dce8f4';ctx.fillRect(0,0,W,H);
-  if(!allPoints.length)return cv;
+// ── NORTH ARROW ───────────────────────────────────────────────────────────────
+function drawNorthArrow(ctx, x, y, size) {
+  ctx.save(); ctx.translate(x, y);
+  ctx.beginPath(); ctx.arc(0, 0, size, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,255,255,.88)';
+  ctx.shadowColor = 'rgba(0,0,0,.15)'; ctx.shadowBlur = 6; ctx.fill(); ctx.shadowBlur = 0;
+  ctx.strokeStyle = 'rgba(0,0,0,.15)'; ctx.lineWidth = 1; ctx.stroke();
+  const h = size * .85;
+  ctx.beginPath(); ctx.moveTo(0, -h); ctx.lineTo(size * .35, h * .3); ctx.lineTo(0, h * .1); ctx.closePath();
+  ctx.fillStyle = '#1e3a5f'; ctx.fill();
+  ctx.beginPath(); ctx.moveTo(0, -h); ctx.lineTo(-size * .35, h * .3); ctx.lineTo(0, h * .1); ctx.closePath();
+  ctx.fillStyle = '#fff'; ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,.2)'; ctx.lineWidth = .5; ctx.stroke();
+  ctx.font = `bold ${size * .7}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#1e3a5f'; ctx.fillText('N', 0, -h * 1.5);
+  ctx.restore();
+}
 
-  const bounds=map.getBounds();
-  const zoom=Math.min(map.getZoom(),16);
-  const minLng=bounds.getWest(),maxLng=bounds.getEast();
-  const minLat=bounds.getSouth(),maxLat=bounds.getNorth();
+// ── MAP CANVAS ────────────────────────────────────────────────────────────────
+async function buildMapCanvas(W, H, onProgress) {
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = '#dce8f4'; ctx.fillRect(0, 0, W, H);
+  if (!allPoints.length) return cv;
 
-  const tx0=lng2tile(minLng,zoom),tx1=lng2tile(maxLng,zoom);
-  const ty0=lat2tile(maxLat,zoom),ty1=lat2tile(minLat,zoom);
-  const TSZ=256;
-  const totalW=(tx1-tx0+1)*TSZ,totalH=(ty1-ty0+1)*TSZ;
-  const tc=document.createElement('canvas');tc.width=totalW;tc.height=totalH;
-  const tctx=tc.getContext('2d');
-  tctx.fillStyle='#dce8f4';tctx.fillRect(0,0,totalW,totalH);
+  const zoom = Math.min(map.getZoom(), pdfQuality === 'hd' ? 17 : 16);
 
-  await Promise.all(
-    Array.from({length:tx1-tx0+1},(_,i)=>tx0+i).flatMap(x=>
-      Array.from({length:ty1-ty0+1},(_,j)=>ty0+j).map(async y=>{
-        const img=await loadTile(TILE_URL(zoom,x,y));
-        if(img)tctx.drawImage(img,(x-tx0)*TSZ,(y-ty0)*TSZ,TSZ,TSZ);
-      })
-    )
-  );
+  // Calcular bounds desde el centro del mapa para que coincidan exactamente
+  // con las dimensiones del canvas, evitando distorsión de proyección
+  const center = map.getCenter();
+  const totalTiles = Math.pow(2, zoom);
+  const sinLat = Math.sin(center.lat * Math.PI / 180);
+  const cTX = (center.lng + 180) / 360 * totalTiles;
+  const cTY = (1 - Math.log((1 + sinLat) / (1 - sinLat)) / (2 * Math.PI)) / 2 * totalTiles;
+  const halfTX = W / 2 / 256, halfTY = H / 2 / 256;
+  const minLng = (cTX - halfTX) / totalTiles * 360 - 180;
+  const maxLng = (cTX + halfTX) / totalTiles * 360 - 180;
+  const maxLat = tile2lat(cTY - halfTY, zoom);
+  const minLat = tile2lat(cTY + halfTY, zoom);
+  const tx0 = Math.floor(cTX - halfTX), tx1 = Math.floor(cTX + halfTX);
+  const ty0 = Math.floor(cTY - halfTY), ty1 = Math.floor(cTY + halfTY);
+  const TSZ = 256;
+  const totalW = (tx1 - tx0 + 1) * TSZ, totalH = (ty1 - ty0 + 1) * TSZ;
+  const tc = document.createElement('canvas'); tc.width = totalW; tc.height = totalH;
+  const tctx = tc.getContext('2d');
+  tctx.fillStyle = '#dce8f4'; tctx.fillRect(0, 0, totalW, totalH);
 
-  const tileLeft=tile2lng(tx0,zoom),tileRight=tile2lng(tx1+1,zoom);
-  const tileTop=tile2lat(ty0,zoom),tileBot=tile2lat(ty1+1,zoom);
-  const mY=lat=>Math.log(Math.tan(Math.PI/4+lat*Math.PI/360));
-  const yMinT=mY(tileBot),yMaxT=mY(tileTop);
-  const toTile=(lat,lng)=>({px:(lng-tileLeft)/(tileRight-tileLeft)*totalW,py:(1-(mY(lat)-yMinT)/(yMaxT-yMinT))*totalH});
-  const tl=toTile(maxLat,minLng),br=toTile(minLat,maxLng);
-  const sx=Math.max(0,tl.px),sy=Math.max(0,tl.py);
-  const sw=Math.min(totalW,br.px)-sx,sh=Math.min(totalH,br.py)-sy;
-  ctx.drawImage(tc,sx,sy,sw,sh,0,0,W,H);
-
-  const yMinB=mY(minLat),yMaxB=mY(maxLat);
-  const projOut=(lat,lng)=>({
-    x:(lng-minLng)/(maxLng-minLng)*W,
-    y:(1-(mY(lat)-yMinB)/(yMaxB-yMinB))*H
-  });
-
-  // Buffers
-  allPoints.forEach(pt=>{
-    const cfg=resultCfg[pt.res]||{};
-    const km=parseFloat(cfg.bufferKm);
-    if(!(km>0))return;
-    const bColor=cfg.bufferColor||'#1e6fb5';
-    const{x,y}=projOut(pt.lat,pt.lng);
-    const dLat=km/111.32;
-    const{y:y2}=projOut(pt.lat+dLat,pt.lng);
-    const rPx=Math.abs(y-y2);
-    ctx.beginPath();ctx.arc(x,y,rPx,0,Math.PI*2);
-    ctx.fillStyle=hexToRgba(bColor,0.15);ctx.fill();
-    ctx.strokeStyle=hexToRgba(bColor,0.7);ctx.lineWidth=1.5;ctx.stroke();
-  });
-
-  // Íconos
-  allPoints.forEach(pt=>{
-    const cfg=resultCfg[pt.res]||{shape:'circle',color:'#0055cc',fill:true,size:'grande'};
-    const{x,y}=projOut(pt.lat,pt.lng);
-    const isz=cfg.size==='pequeño'?Math.max(5,Math.min(10,W/130)):Math.max(9,Math.min(22,W/60));
-    if(x>=-isz&&x<=W+isz&&y>=-isz&&y<=H+isz)drawCanvasShape(ctx,cfg.shape,x,y,isz,cfg.color,cfg.fill);
-  });
-
-  // Etiqueta Islas Malvinas
-  if(malvinasLat>=minLat&&malvinasLat<=maxLat&&malvinasLng>=minLng&&malvinasLng<=maxLng){
-    const{x:mx,y:my}=projOut(malvinasLat,malvinasLng);
-    const fs=Math.max(17,Math.min(27,W/50));
-    ctx.textAlign='center';
-    ctx.font=`bold ${fs}px sans-serif`;
-    ctx.lineWidth=4;ctx.strokeStyle='rgba(255,255,255,0.9)';
-    ctx.strokeText('Islas Malvinas',mx,my);
-    ctx.font=`${Math.round(fs*0.82)}px sans-serif`;
-    ctx.strokeText('(Arg.)',mx,my+fs+3);
-    ctx.font=`bold ${fs}px sans-serif`;
-    ctx.fillStyle='#1a3a5c';ctx.fillText('Islas Malvinas',mx,my);
-    ctx.font=`${Math.round(fs*0.82)}px sans-serif`;
-    ctx.fillStyle='#3a5a7c';ctx.fillText('(Arg.)',mx,my+fs+3);
-    ctx.textAlign='left';
+  const tileList = [];
+  for (let x = tx0; x <= tx1; x++) for (let y = ty0; y <= ty1; y++) tileList.push([x, y]);
+  let loaded = 0;
+  const BATCH = 8;
+  for (let i = 0; i < tileList.length; i += BATCH) {
+    await Promise.all(tileList.slice(i, i + BATCH).map(async ([x, y]) => {
+      const img = await loadTile(TILE_URL(zoom, x, y));
+      if (img) tctx.drawImage(img, (x - tx0) * TSZ, (y - ty0) * TSZ, TSZ, TSZ);
+      loaded++;
+      if (onProgress) onProgress(loaded / tileList.length * 70);
+    }));
   }
 
-  ctx.strokeStyle='#7a9abf';ctx.lineWidth=2;ctx.strokeRect(1,1,W-2,H-2);
+  const tileLeft = tile2lng(tx0, zoom), tileRight = tile2lng(tx1 + 1, zoom);
+  const tileTop = tile2lat(ty0, zoom), tileBot = tile2lat(ty1 + 1, zoom);
+  const yMinT = mY(tileBot), yMaxT = mY(tileTop);
+  const toTile = (lat, lng) => ({ px: (lng - tileLeft) / (tileRight - tileLeft) * totalW, py: (1 - (mY(lat) - yMinT) / (yMaxT - yMinT)) * totalH });
+  const tl = toTile(maxLat, minLng), br = toTile(minLat, maxLng);
+  const sx = Math.max(0, tl.px), sy = Math.max(0, tl.py);
+  const sw = Math.min(totalW, br.px) - sx, sh = Math.min(totalH, br.py) - sy;
+  ctx.drawImage(tc, sx, sy, sw, sh, 0, 0, W, H);
+
+  const yMinB = mY(minLat), yMaxB = mY(maxLat);
+  const projOut = (lat, lng) => ({
+    x: (lng - minLng) / (maxLng - minLng) * W,
+    y: (1 - (mY(lat) - yMinB) / (yMaxB - yMinB)) * H
+  });
+
+  allPoints.forEach(pt => {
+    const cfg = resultCfg[pt.res] || {};
+    const km = parseFloat(cfg.bufferKm);
+    if (!(km > 0)) return;
+    const bColor = cfg.bufferColor || '#2563eb';
+    const { x, y } = projOut(pt.lat, pt.lng);
+    const { y: y2 } = projOut(pt.lat + km / 111.32, pt.lng);
+    const rPx = Math.abs(y - y2);
+    ctx.beginPath(); ctx.arc(x, y, rPx, 0, Math.PI * 2);
+    ctx.fillStyle = hexToRgba(bColor, 0.12); ctx.fill();
+    ctx.strokeStyle = hexToRgba(bColor, 0.65); ctx.lineWidth = 1.5; ctx.stroke();
+  });
+
+  allPoints.forEach(pt => {
+    const cfg = resultCfg[pt.res] || { shape:'circle', color:'#3b82f6', fill:true, size:'grande' };
+    const { x, y } = projOut(pt.lat, pt.lng);
+    const isz = cfg.size === 'pequeño' ? Math.max(5, Math.min(10, W / 130)) : Math.max(9, Math.min(22, W / 60));
+    if (x >= -isz && x <= W + isz && y >= -isz && y <= H + isz)
+      drawCanvasShape(ctx, cfg.shape, x, y, isz, cfg.color, cfg.fill);
+  });
+
+  if (-51.73 >= minLat && -51.73 <= maxLat && -59.0 >= minLng && -59.0 <= maxLng) {
+    const { x: mx, y: my } = projOut(-51.73, -59.0);
+    const fs = Math.max(17, Math.min(27, W / 50));
+    ctx.textAlign = 'center';
+    ctx.font = `bold ${fs}px sans-serif`; ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+    ctx.strokeText('Islas Malvinas', mx, my);
+    ctx.font = `${Math.round(fs * .82)}px sans-serif`; ctx.strokeText('(Arg.)', mx, my + fs + 3);
+    ctx.font = `bold ${fs}px sans-serif`; ctx.fillStyle = '#1a3a5c'; ctx.fillText('Islas Malvinas', mx, my);
+    ctx.font = `${Math.round(fs * .82)}px sans-serif`; ctx.fillStyle = '#3a5a7c'; ctx.fillText('(Arg.)', mx, my + fs + 3);
+    ctx.textAlign = 'left';
+  }
+
+  drawScaleBar(ctx, minLat, minLng, maxLng, W, H);
+  drawNorthArrow(ctx, W - 38, 48, 28);
+  ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.5; ctx.strokeRect(1, 1, W - 2, H - 2);
+  if (onProgress) onProgress(80);
   return cv;
 }
 
-function buildLegendCanvas(W){
-  const entries=Object.entries(resultCfg);
-  if(!entries.length)return null;
-  const COLS=Math.min(entries.length,6);
-  const ROWS=Math.ceil(entries.length/COLS);
-  const ROW_H=90,TITLE_H=60,H=TITLE_H+ROW_H*ROWS+20;
-  const cv=document.createElement('canvas');cv.width=W;cv.height=H;
-  const ctx=cv.getContext('2d');
-  ctx.fillStyle='#1e3a5f';ctx.fillRect(0,0,W,H);
-  ctx.font='bold 28px monospace';ctx.fillStyle='#7ab8e0';ctx.fillText('LEYENDA',14,40);
-  ctx.strokeStyle='rgba(122,184,224,0.3)';ctx.lineWidth=1;
-  ctx.beginPath();ctx.moveTo(14,52);ctx.lineTo(W-14,52);ctx.stroke();
-  const itemW=(W-110)/COLS;
-  entries.forEach(([res,cfg],i)=>{
-    const col=i%COLS,row=Math.floor(i/COLS);
-    const ix=100+col*itemW,iy=TITLE_H+row*ROW_H;
-    drawCanvasShape(ctx,cfg.shape,ix,iy+22,28,cfg.color,cfg.fill);
-    ctx.font='bold 28px sans-serif';ctx.fillStyle='#d0eaff';ctx.textAlign='left';
-    ctx.fillText(res.length>22?res.slice(0,21)+'…':res,ix+36,iy+28);
-    ctx.font='24px monospace';ctx.fillStyle='#7ab8e0';
-    ctx.fillText('n='+allPoints.filter(p=>p.res===res).length,ix+36,iy+58);
+// ── LEGEND CANVAS ─────────────────────────────────────────────────────────────
+function buildLegendCanvas(W) {
+  const entries = Object.entries(resultCfg);
+  if (!entries.length) return null;
+  const COLS = Math.min(entries.length, 5);
+  const ROWS = Math.ceil(entries.length / COLS);
+  const ROW_H = 76, TITLE_H = 48, PAD = 16;
+  const H = TITLE_H + ROW_H * ROWS + PAD;
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#1e293b'; ctx.fillRect(0, 0, W, TITLE_H);
+  ctx.fillStyle = '#3b82f6'; ctx.fillRect(0, 0, 4, H);
+  ctx.font = 'bold 22px sans-serif'; ctx.fillStyle = '#94a3b8'; ctx.fillText('LEYENDA', PAD + 4, 32);
+  ctx.strokeStyle = 'rgba(148,163,184,.2)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(PAD, TITLE_H); ctx.lineTo(W - PAD, TITLE_H); ctx.stroke();
+  const itemW = (W - PAD * 2 - 60) / COLS;
+  entries.forEach(([res, cfg], i) => {
+    const col = i % COLS, row = Math.floor(i / COLS);
+    const ix = PAD + 60 + col * itemW, iy = TITLE_H + row * ROW_H + 10;
+    drawCanvasShape(ctx, cfg.shape, ix - 20, iy + 16, 22, cfg.color, cfg.fill);
+    ctx.font = 'bold 20px sans-serif'; ctx.fillStyle = '#e2e8f0'; ctx.textAlign = 'left';
+    ctx.fillText(res.length > 26 ? res.slice(0, 25) + '…' : res, ix, iy + 20);
+    ctx.font = '16px monospace'; ctx.fillStyle = '#64748b';
+    ctx.fillText('n = ' + allPoints.filter(p => p.res === res).length, ix, iy + 42);
   });
   return cv;
 }
 
 // ── PDF EXPORT ────────────────────────────────────────────────────────────────
-function exportPDF(){
-  const title=document.getElementById('pdfTitle').value.trim()||'Mapa GeoMap Studio';
-  if(!allPoints.length){toast('Cargá datos primero',true);return;}
-  const btn=document.getElementById('pdfBtn'),spin=document.getElementById('spin'),txt=document.getElementById('pdfTxt');
-  const dlWrap=document.getElementById('dlWrap'),dlLink=document.getElementById('dlLink');
-  btn.disabled=true;spin.style.display='block';txt.textContent='Cargando jsPDF…';
-  dlWrap.style.display='none';
+function setProgress(pct) { document.getElementById('progressBar').style.width = pct + '%'; }
 
-  function loadScript(src,cb){
-    if(window.jspdf){cb();return;}
-    const s=document.createElement('script');s.src=src;
-    s.onload=cb;
-    s.onerror=()=>{toast('❌ Sin conexión para cargar jsPDF.',true);reset();};
+function exportPDF() {
+  const title = document.getElementById('pdfTitle').value.trim() || 'Mapa GeoMap Studio';
+  if (!allPoints.length) { toast('Cargá datos primero', true); return; }
+  const btn = document.getElementById('pdfBtn'), spin = document.getElementById('spin'), txt = document.getElementById('pdfTxt');
+  const dlWrap = document.getElementById('dlWrap'), dlLink = document.getElementById('dlLink');
+  const progressWrap = document.getElementById('progressWrap');
+  btn.disabled = true; spin.style.display = 'block'; txt.textContent = 'Cargando jsPDF…';
+  dlWrap.style.display = 'none'; progressWrap.style.display = 'block'; setProgress(0);
+
+  function loadScript(src, cb) {
+    if (window.jspdf) { cb(); return; }
+    const s = document.createElement('script'); s.src = src;
+    s.onload = cb;
+    s.onerror = () => { toast('❌ Sin conexión para cargar jsPDF.', true); reset(); };
     document.head.appendChild(s);
   }
-  function reset(){btn.disabled=false;spin.style.display='none';txt.textContent='⬇ Generar PDF';}
+  function reset() { btn.disabled = false; spin.style.display = 'none'; txt.textContent = '⬇ Generar PDF'; progressWrap.style.display = 'none'; setProgress(0); }
 
-  loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',async()=>{
-    setTimeout(async()=>{
-      try{
-        txt.textContent='Descargando tiles…';
-        const mapEl=document.getElementById('map');
-        const aspectRatio=mapEl.offsetWidth/mapEl.offsetHeight;
-        const canvasW=1400,canvasH=Math.round(canvasW/aspectRatio);
-        const mapCanvas=await buildMapCanvas(canvasW,canvasH);
-        const legCanvas=buildLegendCanvas(1400);
-        const mapSrc=mapCanvas.toDataURL('image/jpeg',0.92);
-        const legSrc=legCanvas?legCanvas.toDataURL('image/png'):null;
+  loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', async () => {
+    setTimeout(async () => {
+      try {
+        // Usar ratio del área disponible en A4 vertical para que el mapa llene la hoja
+        const PW_mm = 210, PH_mm = 297, M_mm = 8, TH_mm = 18;
+        const availW_mm = PW_mm - M_mm * 2;
+        const legH_est = Object.keys(resultCfg).length > 0 ? 52 : 0;
+        const mapH_mm_est = PH_mm - M_mm * 2 - TH_mm - 4 - (legH_est > 0 ? legH_est + 3 : 0);
+        const aspectRatio = availW_mm / mapH_mm_est;
+        const canvasW = pdfQuality === 'hd' ? 1600 : 1100;
+        const canvasH = Math.round(canvasW / aspectRatio);
+        const mapCanvas = await buildMapCanvas(canvasW, canvasH, pct => {
+          setProgress(pct); txt.textContent = `Tiles: ${Math.round(pct)}%`;
+        });
+        const legCanvas = buildLegendCanvas(canvasW);
+        setProgress(85); txt.textContent = 'Generando PDF…';
+        const mapSrc = mapCanvas.toDataURL('image/jpeg', pdfQuality === 'hd' ? 0.95 : 0.92);
+        const legSrc = legCanvas ? legCanvas.toDataURL('image/png') : null;
 
-        txt.textContent='Generando PDF…';
-        const{jsPDF}=window.jspdf;
-        const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-        const PW=210,PH=297,M=8,TH=16,availW=PW-M*2;
-        const legH_mm=legCanvas?Math.min(Math.round((legCanvas.height/legCanvas.width)*availW),50):0;
-        const mapH_mm=Math.min(PH-M*2-TH-3-(legH_mm>0?legH_mm+2:0),Math.round(availW/aspectRatio));
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        const PW = 210, PH = 297, M = 8, TH = 18, availW = PW - M * 2;
+        const legH_mm = legCanvas ? Math.min(Math.round((legCanvas.height / legCanvas.width) * availW), 55) : 0;
+        const mapH_mm = PH - M * 2 - TH - 4 - (legH_mm > 0 ? legH_mm + 3 : 0);
 
-        pdf.setFillColor(240,247,255);pdf.rect(0,0,PW,PH,'F');
-        pdf.setFillColor(30,111,181);pdf.rect(M,M,availW,TH,'F');
-        pdf.setFillColor(90,176,240);pdf.rect(M,M,4,TH,'F');
-        pdf.setFont('helvetica','bold');pdf.setFontSize(13);pdf.setTextColor(255,255,255);
-        pdf.text(title,M+8,M+TH*0.68);
-        pdf.setFont('helvetica','normal');pdf.setFontSize(7);pdf.setTextColor(180,220,255);
-        const ds=new Date().toLocaleDateString('es-AR',{year:'numeric',month:'long',day:'numeric'});
-        pdf.text(`${ds}  ·  ${allPoints.length} puntos`,PW-M-3,M+TH*0.68,{align:'right'});
-        const mapY=M+TH+2;
-        pdf.addImage(mapSrc,'JPEG',M,mapY,availW,mapH_mm,undefined,'FAST');
-        pdf.setDrawColor(180,210,240);pdf.setLineWidth(0.3);pdf.rect(M,mapY,availW,mapH_mm);
-        if(legSrc&&legH_mm>0)pdf.addImage(legSrc,'PNG',M,mapY+mapH_mm+2,availW,legH_mm,undefined,'FAST');
-        pdf.setFontSize(5.5);pdf.setTextColor(140,170,200);pdf.text('GeoMap Studio',PW-M-2,PH-3,{align:'right'});
+        pdf.setFillColor(241, 245, 249); pdf.rect(0, 0, PW, PH, 'F');
+        pdf.setFillColor(15, 23, 42); pdf.rect(M, M, availW, TH, 'F');
+        pdf.setFillColor(37, 99, 235); pdf.rect(M, M, 5, TH, 'F');
+        pdf.setFont('helvetica', 'bold'); pdf.setFontSize(13); pdf.setTextColor(255, 255, 255);
+        pdf.text(title, M + 9, M + TH * .68);
+        pdf.setFont('helvetica', 'normal'); pdf.setFontSize(7); pdf.setTextColor(148, 163, 184);
+        const ds = new Date().toLocaleDateString('es-AR', { year:'numeric', month:'long', day:'numeric' });
+        pdf.text(`${ds}  ·  ${allPoints.length} puntos  ·  ${Object.keys(resultCfg).length} resultados`, PW - M - 3, M + TH * .68, { align:'right' });
 
-        const pdfDataUri=pdf.output('datauristring');
-        const safeName=(title.replace(/[^a-z0-9_\- ]/gi,'')||'mapa').trim().replace(/\s+/g,'-');
-        dlLink.href=pdfDataUri;
-        dlLink.download=safeName+'.pdf';
-        dlLink.textContent='📄 Descargar '+safeName+'.pdf — click aquí';
-        dlWrap.style.display='block';
+        const mapY = M + TH + 2;
+        pdf.addImage(mapSrc, 'JPEG', M, mapY, availW, mapH_mm, undefined, 'FAST');
+        pdf.setDrawColor(148, 163, 184); pdf.setLineWidth(0.3); pdf.rect(M, mapY, availW, mapH_mm);
+        if (legSrc && legH_mm > 0)
+          pdf.addImage(legSrc, 'PNG', M, mapY + mapH_mm + 3, availW, legH_mm, undefined, 'FAST');
+        pdf.setFontSize(5.5); pdf.setTextColor(148, 163, 184);
+        pdf.text('GeoMap Studio v5.0  ·  Leaflet + OpenStreetMap', PW - M - 2, PH - 3, { align:'right' });
+
+        setProgress(100);
+        const pdfDataUri = pdf.output('datauristring');
+        const safeName = (title.replace(/[^a-z0-9_\- ]/gi, '') || 'mapa').trim().replace(/\s+/g, '-');
+        dlLink.href = pdfDataUri; dlLink.download = safeName + '.pdf';
+        dlLink.textContent = '📄 Descargar ' + safeName + '.pdf — click aquí';
+        dlWrap.style.display = 'block';
         toast('✓ PDF listo — hacé click en el botón azul');
-      }catch(err){console.error(err);toast('❌ Error: '+err.message,true);}
-      finally{reset();}
-    },60);
+      } catch (err) { console.error(err); toast('❌ Error: ' + err.message, true); }
+      finally { reset(); }
+    }, 60);
   });
 }
 
 // ── TOAST ─────────────────────────────────────────────────────────────────────
-function toast(msg,err=false){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.style.borderColor=err?'#f5b8b8':'#a3d9be';t.style.color=err?'#a33030':'var(--ok)';
-  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),5000);
+function toast(msg, err = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderColor = err ? '#fecaca' : '#bbf7d0';
+  t.style.color = err ? '#dc2626' : '#16a34a';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 5000);
 }
 </script>
 </body>
