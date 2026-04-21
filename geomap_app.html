@@ -181,6 +181,7 @@ input.ti::placeholder{color:#94a3b8}
         <button class="pdf-opt-btn on" data-q="standard" onclick="setPdfQ(this)">📄 Estándar</button>
         <button class="pdf-opt-btn" data-q="hd" onclick="setPdfQ(this)">🔍 Alta res</button>
       </div>
+      <button class="pdf-opt-btn on" id="legToggle" onclick="toggleLegend(this)" style="width:100%;margin-bottom:8px">📋 Incluir leyenda</button>
       <button class="btn btn-p" id="pdfBtn" onclick="exportPDF()" disabled>
         <div class="spin" id="spin"></div>
         <span id="pdfTxt">⬇ Generar PDF</span>
@@ -356,8 +357,13 @@ function setSize(btn) {
 }
 function setPdfQ(btn) {
   pdfQuality = btn.dataset.q;
-  document.querySelectorAll('.pdf-opt-btn').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll('.pdf-opt-btn[data-q]').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
+}
+let includeLegend = true;
+function toggleLegend(btn) {
+  includeLegend = !includeLegend;
+  btn.classList.toggle('on', includeLegend);
 }
 
 // ── SVG ICON ──────────────────────────────────────────────────────────────────
@@ -638,7 +644,7 @@ function exportPDF() {
         // Usar ratio del área disponible en A4 vertical para que el mapa llene la hoja
         const PW_mm = 210, PH_mm = 297, M_mm = 8, TH_mm = 18;
         const availW_mm = PW_mm - M_mm * 2;
-        const legH_est = Object.keys(resultCfg).length > 0 ? 52 : 0;
+        const legH_est = (includeLegend && Object.keys(resultCfg).length > 0) ? 52 : 0;
         const mapH_mm_est = PH_mm - M_mm * 2 - TH_mm - 4 - (legH_est > 0 ? legH_est + 3 : 0);
         const aspectRatio = availW_mm / mapH_mm_est;
         const canvasW = pdfQuality === 'hd' ? 1600 : 1100;
@@ -646,7 +652,7 @@ function exportPDF() {
         const mapCanvas = await buildMapCanvas(canvasW, canvasH, pct => {
           setProgress(pct); txt.textContent = `Tiles: ${Math.round(pct)}%`;
         });
-        const legCanvas = buildLegendCanvas(canvasW);
+        const legCanvas = includeLegend ? buildLegendCanvas(canvasW) : null;
         setProgress(85); txt.textContent = 'Generando PDF…';
         const mapSrc = mapCanvas.toDataURL('image/jpeg', pdfQuality === 'hd' ? 0.95 : 0.92);
         const legSrc = legCanvas ? legCanvas.toDataURL('image/png') : null;
