@@ -212,10 +212,38 @@ input.ti::placeholder{color:#94a3b8}
 <script>
 // ── MAP ───────────────────────────────────────────────────────────────────────
 const map = L.map('map', { center: [-34.6, -58.4], zoom: 5 });
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-  maxZoom: 19
-}).addTo(map);
+
+const baseLayers = {
+  '🗺 Callejero': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>', maxZoom: 19
+  }),
+  '🛰 Satélite': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '© Esri, Maxar, Earthstar Geographics', maxZoom: 19
+  }),
+  '⛰ Relieve': L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenTopoMap, OpenStreetMap contributors', maxZoom: 17
+  }),
+  '🌐 Cartografía limpia': L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© CartoDB, OpenStreetMap contributors', maxZoom: 19
+  })
+};
+
+baseLayers['🗺 Callejero'].addTo(map);
+L.control.layers(baseLayers, null, { position: 'topright', collapsed: true }).addTo(map);
+
+let activeLayerUrl = (z, x, y) => `https://${'abc'[(x+y)%3]}.tile.openstreetmap.org/${z}/${x}/${y}.png`;
+
+const layerTileUrls = {
+  '🗺 Callejero':          (z,x,y) => `https://${'abc'[(x+y)%3]}.tile.openstreetmap.org/${z}/${x}/${y}.png`,
+  '🛰 Satélite':           (z,x,y) => `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${y}/${x}`,
+  '⛰ Relieve':            (z,x,y) => `https://${'abc'[(x+y)%3]}.tile.opentopomap.org/${z}/${x}/${y}.png`,
+  '🌐 Cartografía limpia': (z,x,y) => `https://${'ab'[(x+y)%2]}.basemaps.cartocdn.com/light_all/${z}/${x}/${y}.png`
+};
+
+map.on('baselayerchange', e => {
+  activeLayerUrl = layerTileUrls[e.name] || layerTileUrls['🗺 Callejero'];
+  tileCache.clear();
+});
 
 map.on('mousemove', e => {
   document.getElementById('coordInfo').textContent =
@@ -414,7 +442,6 @@ function clearAll() {
 }
 
 // ── TILE HELPERS + CACHE ───────────────────────────────────────────────────────
-const TILE_URL = (z, x, y) => `https://${'abc'[(x+y)%3]}.tile.openstreetmap.org/${z}/${x}/${y}.png`;
 const tileCache = new Map();
 
 function loadTile(url) {
@@ -526,7 +553,7 @@ async function buildMapCanvas(W, H, onProgress) {
   const BATCH = 8;
   for (let i = 0; i < tileList.length; i += BATCH) {
     await Promise.all(tileList.slice(i, i + BATCH).map(async ([x, y]) => {
-      const img = await loadTile(TILE_URL(zoom, x, y));
+      const img = await loadTile(activeLayerUrl(zoom, x, y));
       if (img) tctx.drawImage(img, (x - tx0) * TSZ, (y - ty0) * TSZ, TSZ, TSZ);
       loaded++;
       if (onProgress) onProgress(loaded / tileList.length * 70);
