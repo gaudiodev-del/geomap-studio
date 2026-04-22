@@ -169,6 +169,16 @@ input.ti::placeholder{color:#94a3b8}
     </div>
 
     <div class="sec">
+      <div class="sec-title"><span class="sec-icon">💾</span>Proyecto</div>
+      <button class="btn btn-s" onclick="saveProject()">⬇ Guardar proyecto</button>
+      <div class="dropzone" id="dzProject" style="padding:12px">
+        <input type="file" id="fiProject" accept=".geomapjson">
+        <div class="ico" style="font-size:20px;margin-bottom:4px">📁</div>
+        <p style="font-size:11px"><strong>Cargar proyecto</strong><br><small style="opacity:.6">.geomapjson</small></p>
+      </div>
+    </div>
+
+    <div class="sec">
       <div class="sec-title"><span class="sec-icon">🗺</span>Mapa</div>
       <button class="btn btn-s" onclick="fitMap()">🎯 Centrar en puntos</button>
       <button class="btn btn-s" style="margin-bottom:0" onclick="clearAll()">🗑 Limpiar todo</button>
@@ -719,6 +729,65 @@ function exportPDF() {
     }, 60);
   });
 }
+
+// ── PROYECTO GUARDAR / CARGAR ─────────────────────────────────────────────────
+function saveProject() {
+  if (!allPoints.length) { toast('No hay datos para guardar', true); return; }
+  const project = {
+    version: 1,
+    savedAt: new Date().toISOString(),
+    points: allPoints,
+    config: resultCfg,
+    mapCenter: [map.getCenter().lat, map.getCenter().lng],
+    mapZoom: map.getZoom()
+  };
+  const blob = new Blob([JSON.stringify(project, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'proyecto-geomap-' + new Date().toISOString().slice(0,10) + '.geomapjson';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('✓ Proyecto guardado');
+}
+
+function loadProject(file) {
+  const rd = new FileReader();
+  rd.onload = e => {
+    try {
+      const project = JSON.parse(e.target.result);
+      if (!project.points || !project.config) throw new Error('Archivo inválido');
+      allPoints = project.points;
+      resultCfg = project.config;
+      document.getElementById('fileInfo').style.display = 'block';
+      document.getElementById('fname').textContent = file.name;
+      document.getElementById('stTotal').textContent = allPoints.length;
+      document.getElementById('stRes').textContent = Object.keys(resultCfg).length;
+      document.getElementById('hPts').textContent = allPoints.length;
+      document.getElementById('hRes').textContent = Object.keys(resultCfg).length;
+      document.getElementById('hStatPts').style.display = 'flex';
+      document.getElementById('hStatRes').style.display = 'flex';
+      document.getElementById('mapInfo').style.display = 'block';
+      document.getElementById('pdfBtn').disabled = false;
+      document.getElementById('empty').classList.add('gone');
+      buildList();
+      renderMarkers();
+      if (project.mapCenter && project.mapZoom)
+        map.setView(project.mapCenter, project.mapZoom);
+      else
+        fitMap();
+      toast('✓ Proyecto cargado — ' + allPoints.length + ' puntos');
+    } catch (err) { toast('❌ Archivo de proyecto inválido', true); }
+  };
+  rd.readAsText(file);
+}
+
+const dzProject = document.getElementById('dzProject');
+const fiProject = document.getElementById('fiProject');
+dzProject.addEventListener('dragover', e => { e.preventDefault(); dzProject.classList.add('over'); });
+dzProject.addEventListener('dragleave', () => dzProject.classList.remove('over'));
+dzProject.addEventListener('drop', e => { e.preventDefault(); dzProject.classList.remove('over'); if (e.dataTransfer.files[0]) loadProject(e.dataTransfer.files[0]); });
+fiProject.addEventListener('change', e => { if (e.target.files[0]) loadProject(e.target.files[0]); });
 
 // ── TOAST ─────────────────────────────────────────────────────────────────────
 function toast(msg, err = false) {
